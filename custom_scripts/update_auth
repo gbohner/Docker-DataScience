@@ -5,7 +5,7 @@
 
 
 # Create a grep-able pattern, only with exact matches with user names in the "users.list" file
-USERMATCH=$(cat users.list | tr '\n' '|' | sed -e "s/^/(\^/" | sed -e "s/|$/)/" | sed -e 's/|/|\^/g')
+USERMATCH=$(cat /src/users.list | tr '\n' '|' | sed -e "s/^/(\^/" | sed -e "s/|$/)/" | sed -e 's/|/|\^/g')
 
 # In order: Get users.list, change newlines to | for grep OR, add a "'(^" at beginning, add a ")'" at the end (for grep OR pattern completed), make sure that all user names start at beginning of the line via "^" after the "|" or symbol
 

@@ -12,6 +12,10 @@ USER root
 COPY ./custom_scripts/update_auth /usr/local/bin/update_auth
 RUN chmod +x /usr/local/bin/update_auth
 
+# Add the list of users to be authenticated
+COPY ./users.list /src/users.list
+RUN chmod +r /src/users.list
+
 # Make sure that before /init we run the update_auth script
 ADD ./custom_scripts/custom_init /custom_init
 RUN chmod +x /custom_init
