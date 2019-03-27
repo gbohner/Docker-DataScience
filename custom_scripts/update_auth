@@ -1,0 +1,30 @@
+#!/bin/bash
+# Get host usernames and passwords working in container, with correct uid, provided username is given in the "users.list" file
+
+# When running the container, mount the whole /etc folder onto the containers /tmp/user_auth, then add the relevant lines from the "passwd" and "shadow" files to the container's /etc/passwd and /etc/shadow files, via running this "update_auth.sh" script!
+
+
+# Create a grep-able pattern, only with exact matches with user names in the "users.list" file
+USERMATCH=$(cat users.list | tr '\n' '|' | sed -e "s/^/(\^/" | sed -e "s/|$/)/" | sed -e 's/|/|\^/g')
+
+# In order: Get users.list, change newlines to | for grep OR, add a "'(^" at beginning, add a ")'" at the end (for grep OR pattern completed), make sure that all user names start at beginning of the line via "^" after the "|" or symbol
+
+
+# First remove existing users to avoid duplications
+grep -v -E "$USERMATCH" /etc/passwd > /etc/tmp_passwd
+mv /etc/tmp_passwd /etc/passwd
+grep -v -E "$USERMATCH" /etc/shadow > /etc/tmp_shadow
+mv /etc/tmp_shadow /etc/shadow
+
+# Then append safe haven users and passwords from the mounted host password directory
+grep -E "$USERMATCH" /tmp/user_auth/passwd >> /etc/passwd
+grep -E "$USERMATCH" /tmp/user_auth/shadow >> /etc/shadow
+
+# Create home directories for each user
+grep -E "$USERMATCH" /etc/passwd | cut -d: -f1 | sed -e 's/^/\/home\//' | xargs mkdir -p
+
+# Add each user to the "users" group
+grep -E "$USERMATCH" /etc/passwd | cut -d: -f1 | xargs -L 1 usermod -g users
+
+# Fix permissions
+fix-permissions /home

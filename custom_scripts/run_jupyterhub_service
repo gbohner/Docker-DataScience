@@ -1,0 +1,2 @@
+#!/usr/bin/with-contenv bash
+exec jupyterhub -f /etc/jupyter/jupyterhub_config.py

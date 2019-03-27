@@ -1,0 +1,22 @@
+# Recreate users from host machine to docker container
+# Requires running "run_on_host/host_create_users" first
+FROM safehaven_ds:stage2
+
+
+# ----------------------------------------------------------
+# Add list of safe haven users to container authentications
+# ----------------------------------------------------------
+
+USER root
+
+# Add autentication from host (via volume mapped /etc and using project number)
+COPY ./install_scripts_custom/update_auth /usr/local/bin/update_auth
+RUN chmod +x /usr/local/bin/update_auth
+
+# Make sure that before /init we run the update_auth script
+ADD ./install_scripts_custom/custom_init /custom_init
+RUN chmod +x /custom_init
+
+# Move this to other place (earlier, to jupyterhub settings), atm just here for testing
+ADD ./install_scripts_custom/run_jupyterhub_service /etc/services.d/jupyterhub/run	
+ADD ./install_scripts_custom/jupyterhub_config.py /etc/jupyter/jupyterhub_config.py
