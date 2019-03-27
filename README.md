@@ -22,7 +22,9 @@ Collaboration tools provided are **git** for code version control and **dvc** fo
 ## Setup
 
 1. Edit the ```users.list``` file to match host machine user names (do **not** include host user with UID 1000)
-2. Run the ```bash 
+2. Run the ```sudo bash docker_build_all.sh``` script to create the appropriate docker image (including user setup)
+3. Run the ```sudo bash docker_run_command.sh``` script to start the docker container and start providing the services
+4. People logged onto the host machine can now access the services in the browser via ```localhost:8000``` and ```localhost:8787```. Alternatively, one can access the services from more remotely via appropriate SSH port forwarding to the host machine, such as ```ssh -L 8000:localhost:8000 -L 8787:localhost:8787 <USERNAME>@<HOST_IP>``` or configuring ```putty``` on Windows, and then using the browser on the machine from which you tunneled from, at the same localhost addresses.
 
 ### User authentication
 
