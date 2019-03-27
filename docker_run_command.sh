@@ -5,5 +5,5 @@ docker run -it \
 	-e PASSWORD=pass \
 	-p 8787:8787 \
 	-p 8000:8000 \
-	safehaven_ds:test_version_control \
+	safehaven_ds:test_versioncontrol \
 	/custom_init
