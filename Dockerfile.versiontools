@@ -26,6 +26,6 @@ RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
 # Add version control tools script (for now run manually, later add to the /custom_init script, just after the creation of users)
-ADD ./install_scripts_custom/setup_version_control.sh /src/setup_version_control.sh
+ADD ./custom_scripts/setup_version_control.sh /src/setup_version_control.sh
 RUN chmod +x /src/setup_version_control.sh
     
