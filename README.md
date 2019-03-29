@@ -1,3 +1,5 @@
+Note - currently work in progress as of 29 Mar 2019, use at your own risk. Stable version expected mid-April.
+
 # Docker data science server for safe havens
 
 This repository implements a single-machine, single-container docker data science setup for small collaborative teams, intended to run within a secure environment.
