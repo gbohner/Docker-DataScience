@@ -1,5 +1,5 @@
 # Recreate users from host machine to docker container
-FROM safehaven_ds:stage2
+FROM safehaven_ds:stage5
 
 
 # ----------------------------------------------------------
