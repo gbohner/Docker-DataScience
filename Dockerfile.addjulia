@@ -1,5 +1,5 @@
 # Add julia and IJulia
-FROM safehaven_ds:stage3
+FROM safehaven_ds:stage4
 
 USER root
 
@@ -36,7 +36,8 @@ RUN fix-permissions $JULIA_PKGDIR
 # Fix permissions via root user (did not work in "stage2", fix that later there)
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER && \
-    fix-permissions $JULIA_PKGDIR $CONDA_DIR/share/jupyter && \
+    fix-permissions $JULIA_PKGDIR && \ 
+    fix-permissions $CONDA_DIR/share/jupyter && \
     fix-permissions /usr/local/lib/R/site-library
 
 USER $NB_UID
@@ -57,4 +58,21 @@ RUN julia -e 'import Pkg; Pkg.update()' && \
     chmod -R go+rx $CONDA_DIR/share/jupyter && \
     rm -rf $HOME/.local
 
+
+USER root
+
+RUN fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER && \
+    fix-permissions $JULIA_PKGDIR && \
+    fix-permissions $CONDA_DIR/share/jupyter && \
+    fix-permissions /usr/local/lib/R/site-library
+
+# Gergo - Edit the global PAM authentication configuration files to include the required environment variable JULIA_DEPOT_PATH
+#RUN echo "JULIA_DEPOT_PATH DEFAULT=/opt/julia OVERRIDE=/opt/julia" >> /etc/security/pam_env.conf
+
+# Alternatively configure jupyter_notebook_config.py to add the environment variable
+RUN echo -e "\n\n\n" >> /etc/jupyter/jupyter_notebook_config.py && \
+    echo "os.environ['JULIA_DEPOT_PATH'] = '/opt/julia'" >> /etc/jupyter/jupyter_notebook_config.py
+
+USER $NB_UID
 
