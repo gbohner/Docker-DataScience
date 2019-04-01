@@ -24,7 +24,16 @@ grep -E "$USERMATCH" /tmp/user_auth/shadow >> /etc/shadow
 grep -E "$USERMATCH" /etc/passwd | cut -d: -f1 | sed -e 's/^/\/home\//' | xargs mkdir -p
 
 # Add each user to the "users" group
-grep -E "$USERMATCH" /etc/passwd | cut -d: -f1 | xargs -L 1 usermod -g users
+grep -E "$USERMATCH" /etc/passwd | cut -d: -f1 | xargs -L 1 usermod -g $(cat /src/users.group.name)
 
 # Fix permissions
+# Export environment variables so that fix-permissions works well
+export NB_GID=$(cat /src/users.group.gid)
+
+# Allow group rwx permissions for all users who belong to NB_GID 
 fix-permissions /home
+fix-permissions /mnt
+
+# Set umask to 002 so all newly created files (by jupyterhub user, such as .ipynb_checkpoints) are accessible to all
+umask 002
+

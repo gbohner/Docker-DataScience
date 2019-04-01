@@ -79,6 +79,21 @@ COPY ./docker-stacks/base-notebook/start.sh /usr/local/bin/
 COPY ./docker-stacks/base-notebook/start-notebook.sh /usr/local/bin/
 COPY ./docker-stacks/base-notebook/start-singleuser.sh /usr/local/bin/
 COPY ./docker-stacks/base-notebook/jupyter_notebook_config.py /etc/jupyter/
+
+# Gergo - Add jupyterhub settings
+ADD ./custom_scripts/run_jupyterhub_service /etc/services.d/jupyterhub/run
+ADD ./custom_scripts/jupyterhub_config.py /etc/jupyter/jupyterhub_config.py
+
+# Modify user umask in jupyter_notebook_config.py
+# RUN echo -e "\n\n\n" >> /etc/jupyter/jupyter_notebook_config.py && \
+#    echo "import os" >> /etc/jupyter/jupyter_notebook_config.py && \
+#    echo -e "\n\n" >> /etc/jupyter/jupyter_notebook_config.py && \
+#    echo "os.umask(0o002)" >> /etc/jupyter/jupyter_notebook_config.py
+
+# Make sure that before /init we run the update_auth user authentication script
+ADD ./custom_scripts/custom_init /custom_init
+RUN chmod +x /custom_init
+
 RUN fix-permissions /etc/jupyter/
 
 
