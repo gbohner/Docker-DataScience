@@ -1,8 +1,8 @@
 #!/bin/bash
 # Build all stages successively, and also save build log to file for examination later
 docker build -t safehaven_ds:stage1 \
-	--build_arg NB_GID=$(cat users.group.gid) \
-	--build_arg NB_GNAME=$(cat users.group.name) \
+	--build-arg NB_GID=$(cat users.group.gid) \
+	--build-arg NB_GNAME=$(cat users.group.name) \
  	-f Dockerfile.stage1 . 2>&1 | tee build.log
 docker build -t safehaven_ds:stage2 -f Dockerfile.stage2 . 2>&1 | tee -a build.log
 docker build -t safehaven_ds:test_user_auth -f Dockerfile.createusers . 2>&1 | tee -a build.log
