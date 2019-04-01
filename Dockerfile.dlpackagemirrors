@@ -1,0 +1,16 @@
+# Download package repository mirrors?
+# (cran, bioconductor, pyPI, Julia Pkg)
+# pyPI - https://github.com/pypa/bandersnatch
+# Julia Pkg Mirror - https://github.com/UnofficialJuliaMirror
+
+ARG FROM_STAGE=test_versioncontrol
+
+FROM ds_safehaven:${FROM_STAGE}
+
+USER root
+
+COPY custom_scripts/download_pkg_mirrors.sh /src/download_pkg_mirrors.sh
+RUN chmod +x /src/download_pkg_mirrors.sh
+RUN bash /src/download_pkg_mirrors.sh
+
+USER $NB_UID
