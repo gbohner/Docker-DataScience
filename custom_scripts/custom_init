@@ -1,3 +1,4 @@
 #!/bin/bash
 update_auth
+bash /src/setup_version_control.sh
 /init

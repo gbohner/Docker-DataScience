@@ -1,22 +1,25 @@
 # Add command line and version control tools, 
 # configure version control on mounted volume (path in container /mnt/study-data/ )
 
+ARG PROJECT_NAME=project
+
+ARG FROM_STAGE=test_user_auth
+
 # For now built on top of user_auth, but this will need to be an earlier stage!!!
-FROM safehaven_ds:test_user_auth
+FROM safehaven_ds:${FROM_STAGE}
 
 
 USER root
 
 # Standard debian command line tools tools (except remove apt-listchanges, that gives an error for some reason)
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends tasksel && \
-    apt-get install -yq --no-install-recommends $(tasksel --task-packages standard | grep -v apt-listchanges) && \
-    rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && \
+#    apt-get install -yq --no-install-recommends tasksel && \
+#    apt-get install -yq --no-install-recommends $(tasksel --task-packages standard | grep -v apt-listchanges) && \
+#    rm -rf /var/lib/apt/lists/*
 
 # ---------------------
 # Version control tools
 # ---------------------
-
 
 # git is already installed
 RUN pip install dvc
@@ -25,7 +28,9 @@ RUN pip install dvc
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
+
+ENV PROJECT_NAME=project
+
 # Add version control tools script (for now run manually, later add to the /custom_init script, just after the creation of users)
 ADD ./custom_scripts/setup_version_control.sh /src/setup_version_control.sh
-RUN chmod +x /src/setup_version_control.sh
-    
+RUN chmod +x /src/setup_version_control.sh    
