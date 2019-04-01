@@ -1,5 +1,6 @@
 # Add Tensorflow and keras
-FROM safehaven_ds:stage3
+ARG FROM_STAGE=stage3
+FROM safehaven_ds:${FROM_STAGE}
 
 # Gergo - copied from https://github.com/jupyter/docker-stacks/blob/master/tensorflow-notebook/Dockerfile
 
