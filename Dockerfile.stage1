@@ -11,13 +11,24 @@ LABEL maintainer="Gergo Bohner <gergo.bohner@warwick.ac.uk>"
 
 # Copied from https://github.com/jupyter/docker-stacks/blob/master/base-notebook/Dockerfile
 
-# Change user name from jovyan to rstudio due to different base image
+# Gergo - Change user name from jovyan to rstudio due to different base image
+
 ARG NB_USER="rstudio"
 ARG NB_UID="1000"
-ARG NB_GID="100"
+
+# Gergo - Change $NB_GID to the one from local file, this can be done via the
+# the first docker build command, using 
+# "--build_arg NB_GID=$(cat users.group.gid) --build_arg NB_GNAME=$(cat users.group.name)"
+# See implemented in "docker_build_all.sh" 
+ARG NB_GID
+ARG NB_GNAME
+#ARG NB_GID="100"
+#ARG NB_GNAME="users"
+
 
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
+# Gergo - add "acl" for file access setup
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get -yq dist-upgrade \
  && apt-get install -yq --no-install-recommends \
@@ -27,10 +38,18 @@ RUN apt-get update && apt-get -yq dist-upgrade \
     sudo \
     locales \
     fonts-liberation \
+    acl \
  && rm -rf /var/lib/apt/lists/*
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
+
+# Standard debian command line tools tools (except remove apt-listchanges, that gives an error for some reason)
+RUN apt-get update && \
+    apt-get install -yq --no-install-recommends tasksel && \
+    apt-get install -yq --no-install-recommends $(tasksel --task-packages standard | grep -v apt-listchanges) && \
+    rm -rf /var/lib/apt/lists/*
+
 
 # Configure environment for python conda
 ENV CONDA_DIR=/opt/conda \
@@ -38,6 +57,7 @@ ENV CONDA_DIR=/opt/conda \
     NB_USER=$NB_USER \
     NB_UID=$NB_UID \
     NB_GID=$NB_GID \
+    NB_GNAME=$NB_GNAME \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
@@ -56,12 +76,15 @@ RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashr
 # Create NB_USER wtih name jovyan user with UID=1000 and in the 'users' group
 # and make sure these dirs are writable by the `users` group.
 # Gergo -  Above is wrong! The rocker/rstudio image already created the rstudio user with UID=1000 and users group, we'll use that as base instead of creating a new one called jovyan
-RUN echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
+# Gergo - To ensure mounted directory access rights are correct, we'll create the group same as we have on host!
+# Add the group to NB_USER and set it to primary group
+RUN groupadd -g $NB_GID $NB_GNAME && \
+    usermod -a -G $NB_GNAME $NB_USER && \
+    usermod -g $NB_GNAME $NB_USER && \
+    echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
     mkdir -p $CONDA_DIR && \
     chown $NB_USER:$NB_GID $CONDA_DIR && \
     chmod g+w /etc/passwd
-
-
 
 USER root
 

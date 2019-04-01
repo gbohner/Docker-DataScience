@@ -1,0 +1,227 @@
+Sending build context to Docker daemon  2.599MB
+Step 1/28 : FROM rocker/tidyverse:3.5.1
+ ---> f85ce3f9358a
+Step 2/28 : LABEL maintainer="Gergo Bohner <gergo.bohner@warwick.ac.uk>"
+ ---> Using cache
+ ---> bb5db664ed15
+Step 3/28 : ARG NB_USER="rstudio"
+ ---> Using cache
+ ---> 418e22789c0a
+Step 4/28 : ARG NB_UID="1000"
+ ---> Using cache
+ ---> 894d2ed41301
+Step 5/28 : ARG NB_GID
+ ---> Using cache
+ ---> a1277121ce59
+Step 6/28 : ARG NB_GNAME
+ ---> Using cache
+ ---> 1c933f957a9c
+Step 7/28 : ENV DEBIAN_FRONTEND noninteractive
+ ---> Using cache
+ ---> 5656e870c59c
+Step 8/28 : RUN apt-get update && apt-get -yq dist-upgrade  && apt-get install -yq --no-install-recommends     wget     bzip2     ca-certificates     sudo     locales     fonts-liberation     acl  && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 9accf9fde5ab
+Step 9/28 : RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen &&     locale-gen
+ ---> Using cache
+ ---> 4d627f9e7c0c
+Step 10/28 : RUN apt-get update &&     apt-get install -yq --no-install-recommends tasksel &&     apt-get install -yq --no-install-recommends $(tasksel --task-packages standard | grep -v apt-listchanges) &&     rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 9c89e17b65b9
+Step 11/28 : ENV CONDA_DIR=/opt/conda     SHELL=/bin/bash     NB_USER=$NB_USER     NB_UID=$NB_UID     NB_GID=$NB_GID     NB_GNAME=$NB_GNAME     LC_ALL=en_US.UTF-8     LANG=en_US.UTF-8     LANGUAGE=en_US.UTF-8
+ ---> Using cache
+ ---> 6a8bd0f29a75
+Step 12/28 : ENV PATH=$CONDA_DIR/bin:$PATH     HOME=/home/$NB_USER
+ ---> Using cache
+ ---> a0783a98a524
+Step 13/28 : ADD ./docker-stacks/base-notebook/fix-permissions /usr/local/bin/fix-permissions
+ ---> Using cache
+ ---> f3351701ac79
+Step 14/28 : RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
+ ---> Using cache
+ ---> 28dce6e13e5f
+Step 15/28 : RUN groupadd -g $NB_GID $NB_GNAME &&     usermod -a -G $NB_GNAME $NB_USER &&     usermod -g $NB_GNAME $NB_USER &&     echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su &&     mkdir -p $CONDA_DIR &&     chown $NB_USER:$NB_GID $CONDA_DIR &&     chmod g+w /etc/passwd
+ ---> Using cache
+ ---> d3ce632e7b4c
+Step 16/28 : USER root
+ ---> Using cache
+ ---> 24ba968d7fef
+Step 17/28 : RUN fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> c9d11b9b7b2a
+Step 18/28 : USER $NB_UID
+ ---> Using cache
+ ---> 2602d3a25de4
+Step 19/28 : RUN mkdir /home/$NB_USER/work
+ ---> Using cache
+ ---> 1ab8c479d84d
+Step 20/28 : USER root
+ ---> Using cache
+ ---> 088f9fbdd353
+Step 21/28 : RUN fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> 146b1bc4987a
+Step 22/28 : USER root
+ ---> Using cache
+ ---> beaf703861f8
+Step 23/28 : RUN apt-get update &&     apt-get install -y --no-install-recommends     fonts-dejavu     tzdata     gfortran     gcc &&     rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 5fffe81858e5
+Step 24/28 : USER root
+ ---> Using cache
+ ---> b0c4267a0b13
+Step 25/28 : RUN apt-get update && apt-get install -yq --no-install-recommends 	zlib1g-dev 	libxml2-dev
+ ---> Using cache
+ ---> 644641d2a110
+Step 26/28 : RUN install2.r --libloc /usr/local/lib/R/site-library --error 	IRkernel 	shiny 	Rcpp 	shiny 	sparklyr 	RSQLite 	htmltools 	htmlwidgets 	RCurl 	crayon 	fst 	reshape2 	plyr
+ ---> Using cache
+ ---> 1e97f2cdd195
+Step 27/28 : RUN fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER &&     fix-permissions /usr/local/lib/R/site-library
+ ---> Using cache
+ ---> ba5cf135bb79
+Step 28/28 : USER $NB_UID
+ ---> Using cache
+ ---> 5504b55689b2
+Successfully built 5504b55689b2
+Successfully tagged safehaven_ds:stage1
+Sending build context to Docker daemon  2.604MB
+Step 1/26 : FROM safehaven_ds:stage1
+ ---> 5504b55689b2
+Step 2/26 : ENV MINICONDA_VERSION=4.5.12     CONDA_VERSION=4.6.7
+ ---> Using cache
+ ---> 435245a64f3e
+Step 3/26 : RUN cd /tmp &&     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh &&     echo "866ae9dff53ad0874e1d1a60b1ad1ef8 *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - &&     /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR &&     rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh &&     $CONDA_DIR/bin/conda config --system --prepend channels conda-forge &&     $CONDA_DIR/bin/conda config --system --set auto_update_conda false &&     $CONDA_DIR/bin/conda config --system --set show_channel_urls true &&     $CONDA_DIR/bin/conda install --quiet --yes conda="${CONDA_VERSION%.*}.*" &&     $CONDA_DIR/bin/conda update --all --quiet --yes &&     conda clean -tipsy &&     rm -rf /home/$NB_USER/.cache/yarn
+ ---> Using cache
+ ---> 00f79c9f3082
+Step 4/26 : USER root
+ ---> Using cache
+ ---> 738fa8fe62b3
+Step 5/26 : RUN fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> a0ef7fad0206
+Step 6/26 : USER $NB_UID
+ ---> Using cache
+ ---> d489fa21f7cf
+Step 7/26 : RUN conda install --quiet --yes 'tini=0.18.0' &&     conda list tini | grep tini | tr -s ' ' | cut -d ' ' -f 1,2 >> $CONDA_DIR/conda-meta/pinned &&     conda clean -tipsy
+ ---> Using cache
+ ---> fb22c5f4b9a6
+Step 8/26 : USER root
+ ---> Using cache
+ ---> 2c55ae4e1c4b
+Step 9/26 : RUN fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> 1e84e8c55bee
+Step 10/26 : USER $NB_UID
+ ---> Using cache
+ ---> d098ec670eee
+Step 11/26 : RUN conda install --quiet --yes     'notebook=5.7.5'     'jupyterhub=0.9.4'     'jupyterlab=0.35.4' &&     conda clean -tipsy &&     jupyter labextension install @jupyterlab/hub-extension@^0.12.0 &&     npm cache clean --force &&     jupyter notebook --generate-config &&     rm -rf $CONDA_DIR/share/jupyter/lab/staging &&     rm -rf /home/$NB_USER/.cache/yarn
+ ---> Using cache
+ ---> 90b6dbcdf401
+Step 12/26 : USER root
+ ---> Using cache
+ ---> 305279905b94
+Step 13/26 : RUN fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> 43c966d679e6
+Step 14/26 : EXPOSE 8888
+ ---> Using cache
+ ---> d7205a897e06
+Step 15/26 : WORKDIR $HOME
+ ---> Using cache
+ ---> d2046c1da449
+Step 16/26 : ENTRYPOINT ["tini", "-g", "--"]
+ ---> Using cache
+ ---> 5ab4d41606f7
+Step 17/26 : CMD ["start-notebook.sh"]
+ ---> Using cache
+ ---> f5f13ab72731
+Step 18/26 : COPY ./docker-stacks/base-notebook/start.sh /usr/local/bin/
+ ---> Using cache
+ ---> 493719909f25
+Step 19/26 : COPY ./docker-stacks/base-notebook/start-notebook.sh /usr/local/bin/
+ ---> Using cache
+ ---> a3cd3885c146
+Step 20/26 : COPY ./docker-stacks/base-notebook/start-singleuser.sh /usr/local/bin/
+ ---> Using cache
+ ---> 0c4156bb6fbb
+Step 21/26 : COPY ./docker-stacks/base-notebook/jupyter_notebook_config.py /etc/jupyter/
+ ---> Using cache
+ ---> d443924ce69a
+Step 22/26 : ADD ./custom_scripts/run_jupyterhub_service /etc/services.d/jupyterhub/run
+ ---> Using cache
+ ---> 8b24b262cbed
+Step 23/26 : ADD ./custom_scripts/jupyterhub_config.py /etc/jupyter/jupyterhub_config.py
+ ---> Using cache
+ ---> 4d49b3cb787b
+Step 24/26 : ADD ./custom_scripts/custom_init /custom_init
+ ---> Using cache
+ ---> f18f9e877e3c
+Step 25/26 : RUN chmod +x /custom_init
+ ---> Using cache
+ ---> 85b0187e13cc
+Step 26/26 : RUN fix-permissions /etc/jupyter/
+ ---> Using cache
+ ---> 2c5c6b836037
+Successfully built 2c5c6b836037
+Successfully tagged safehaven_ds:stage2
+Sending build context to Docker daemon  2.607MB
+Step 1/12 : ARG FROM_STAGE=stage5
+Step 2/12 : FROM safehaven_ds:${FROM_STAGE}
+ ---> 2c5c6b836037
+Step 3/12 : USER root
+ ---> Using cache
+ ---> 63d8a26c14a0
+Step 4/12 : COPY ./custom_scripts/update_auth /usr/local/bin/update_auth
+ ---> Using cache
+ ---> 8a5d48138d55
+Step 5/12 : RUN chmod +x /usr/local/bin/update_auth
+ ---> Using cache
+ ---> f1339f4a9473
+Step 6/12 : COPY ./users.* /src/
+ ---> Using cache
+ ---> 5ae25d6488db
+Step 7/12 : RUN chmod +r /src/users.list &&     chmod +r /src/users.group.name
+ ---> Using cache
+ ---> 955bac089b2d
+Step 8/12 : COPY ./custom_scripts/set_global_umask /src/set_global_umask
+ ---> Using cache
+ ---> 37a525d339e6
+Step 9/12 : RUN chmod +r /src/set_global_umask &&     cat /src/set_global_umask >> /etc/profile
+ ---> Using cache
+ ---> c48a2663f6d1
+Step 10/12 : ADD ./custom_scripts/custom_init /custom_init
+ ---> Using cache
+ ---> 8b80265ef7ea
+Step 11/12 : RUN chmod +x /custom_init
+ ---> Using cache
+ ---> 1285e0ef271c
+Step 12/12 : ENV NB_UMASK=0o002
+ ---> Using cache
+ ---> 783d28337260
+Successfully built 783d28337260
+Successfully tagged safehaven_ds:test_user_auth
+Sending build context to Docker daemon  2.608MB
+Step 1/9 : ARG PROJECT_NAME=project
+Step 2/9 : ARG FROM_STAGE=test_user_auth
+Step 3/9 : FROM safehaven_ds:${FROM_STAGE}
+ ---> 783d28337260
+Step 4/9 : USER root
+ ---> Using cache
+ ---> 54c55b691d65
+Step 5/9 : RUN pip install dvc
+ ---> Using cache
+ ---> 54b307ba6d6e
+Step 6/9 : RUN fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> cfc510c5f279
+Step 7/9 : ENV PROJECT_NAME=project
+ ---> Using cache
+ ---> 39324c0d06b3
+Step 8/9 : ADD ./custom_scripts/setup_version_control.sh /src/setup_version_control.sh
+ ---> 0ce932eb37b6
+Step 9/9 : RUN chmod +x /src/setup_version_control.sh
+ ---> Running in a7a8c30adbf9
+Removing intermediate container a7a8c30adbf9
+ ---> 22ac3e5dab7c
+Successfully built 22ac3e5dab7c
+Successfully tagged safehaven_ds:test_versioncontrol

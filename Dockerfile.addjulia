@@ -1,5 +1,6 @@
 # Add julia and IJulia
-FROM safehaven_ds:stage4
+ARG FROM_STAGE=stage4
+FROM safehaven_ds:${FROM_STAGE}
 
 USER root
 
@@ -68,11 +69,21 @@ RUN fix-permissions $CONDA_DIR && \
     fix-permissions /usr/local/lib/R/site-library
 
 # Gergo - Edit the global PAM authentication configuration files to include the required environment variable JULIA_DEPOT_PATH
-#RUN echo "JULIA_DEPOT_PATH DEFAULT=/opt/julia OVERRIDE=/opt/julia" >> /etc/security/pam_env.conf
+# NOTE: This below doesn't work (so commented out) due to PAM authentication seems to fail in jupyterhub
+# RUN echo "JULIA_DEPOT_PATH DEFAULT=/opt/julia OVERRIDE=/opt/julia" >> /etc/security/pam_env.conf
 
-# Alternatively configure jupyter_notebook_config.py to add the environment variable
+# Alternatively configure jupyter_notebook_config.py to add the environment variable on startup
 RUN echo -e "\n\n\n" >> /etc/jupyter/jupyter_notebook_config.py && \
-    echo "os.environ['JULIA_DEPOT_PATH'] = '/opt/julia'" >> /etc/jupyter/jupyter_notebook_config.py
+    echo "os.environ['JULIA_DEPOT_PATH'] = '/opt/julia'" >> /etc/jupyter/jupyter_notebook_config.py && \
+    echo "os.environ['JULIA_LOAD_PATH'] = '/opt/julia'" >> /etc/jupyter/jupyter_notebook_config.py
+
+# Modify user umask in jupyter_notebook_config.py
+RUN echo -e "\n\n\n" >> /etc/jupyter/jupyter_notebook_config.py && \
+    echo "import os" >> /etc/jupyter/jupyter_notebook_config.py && \
+    echo -e "\n\n" >> /etc/jupyter/jupyter_notebook_config.py && \
+    echo "os.umask(0o002)" >> /etc/jupyter/jupyter_notebook_config.py && \
+
+
 
 USER $NB_UID
 

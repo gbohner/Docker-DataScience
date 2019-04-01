@@ -1,6 +1,7 @@
 # Add docker-stacks/minimal-notebook and docker-stacks/scipy-notebook
-FROM safehaven_ds:stage2
+ARG FROM_STAGE=stage2
 
+FROM safehaven_ds:${FROM_STAGE}
 
 # -----------------------------------
 # Add more complete jupyterhub notebooks
