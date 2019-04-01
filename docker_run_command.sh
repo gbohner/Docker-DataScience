@@ -1,7 +1,7 @@
 #!/bin/bash
 docker run -it \
 	-v /etc:/tmp/user_auth \
-	-v /tmp:/mnt/study-data \
+	-v /ds_tmp:/mnt/study-data \
 	-e PASSWORD=pass \
 	-p 8787:8787 \
 	-p 8000:8000 \
