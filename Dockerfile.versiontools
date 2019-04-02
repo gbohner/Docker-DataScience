@@ -28,8 +28,7 @@ RUN pip install dvc
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
-
-ENV PROJECT_NAME=project
+ENV PROJECT_NAME=$PROJECT_NAME
 
 # Add version control tools script (for now run manually, later add to the /custom_init script, just after the creation of users)
 ADD ./custom_scripts/setup_version_control.sh /src/setup_version_control.sh

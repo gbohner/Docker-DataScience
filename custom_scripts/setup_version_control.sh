@@ -23,6 +23,7 @@ dvc remote add -d data_remote /mnt/study-data/${PROJECT_NAME}_repo.dvc
 git add .dvc
 git -c user.name=init_root -c user.email=init@project.com commit -m "Init repo, add dcv config"
 git push
+cd /mnt/study-data
 rm -rf /mnt/study-data/tmp_clone
 
 fix-permissions /mnt/study-data/${PROJECT_NAME}_repo.dvc
