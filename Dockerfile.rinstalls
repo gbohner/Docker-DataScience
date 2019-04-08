@@ -1,0 +1,21 @@
+ARG FROM_STAGE=test_versioncontrol
+# Recreate users from host machine to docker container
+FROM safehaven_ds:${FROM_STAGE}
+
+
+# ----------------------------------------------------------
+# Add list of safe haven users to container authentications
+# ----------------------------------------------------------
+
+USER root
+
+# Install R packages and bindings to other packages
+COPY ./custom_scripts/rinstalls.sh /src/rinstalls.sh
+COPY ./custom_scripts/rscripts /src/rscripts
+RUN chmod +x /src/rinstalls.sh && \
+    chmod -R +x /src/rscripts && \
+    bash /src/rinstalls.sh
+
+# Expose h2o ports
+EXPOSE 54321
+EXPOSE 54322
