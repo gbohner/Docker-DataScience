@@ -10,8 +10,10 @@ FROM safehaven_ds:${FROM_STAGE}
 USER root
 
 # Add autentication from host (via volume mapped /etc and using project number)
+# Also add "root" on docker to "sudo" group, so it can invoke PAM authentication
 COPY ./custom_scripts/update_auth /usr/local/bin/update_auth
-RUN chmod +x /usr/local/bin/update_auth
+RUN chmod +x /usr/local/bin/update_auth && \
+    usermod -a -G sudo root
 
 # Add the list of users to be authenticated
 COPY ./users.* /src/

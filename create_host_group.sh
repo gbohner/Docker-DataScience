@@ -10,7 +10,7 @@ then
 	echo "Data safe haven users group successfully created"
 	
 	# Add the users from "users.list" to the group
-	cat users.list | xargs -L1 usermod -G $(cat users.group.name) 
+	cat users.list | xargs -L1 usermod -aG $(cat users.group.name) 
 
 else
 	echo "ERROR: Data safe haven user group creation FAILED!"
